@@ -1,4 +1,4 @@
-from flask import Flask ,render_template ,request
+from flask import Flask ,render_template ,request ,jsonify 
 import numpy as np
 import joblib 
 import sys
@@ -39,13 +39,15 @@ def greeting():
     
     X_test = scaler.transform(inputs)
 
+    # json_ = jsonify(X_test.tolist())
+
     predicted = model.predict(X_test)
 
     if predicted == [1] :
         a = "scam"
-    else : a = 'fine'
+    else : a = 'legit'
 
-    return render_template('prediction.html', a = a , b = X_test )
+    return render_template('prediction.html', a = jsonify({"data": X_test.tolist()}) , b = a )
 
 if __name__ == '__main__':
     try:
