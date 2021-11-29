@@ -7,13 +7,13 @@ import os
 app = Flask(__name__) 
 inputs = np.zeros(shape = [1,9])
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-LOCATION = ROOT_DIR +'\model'
-model_path = os.path.join(LOCATION, 'model.pkl')
-scaler_path = os.path.join(LOCATION, 'scaler.pkl')
+# ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+# LOCATION = ROOT_DIR +'\model'
+# model_path = os.path.join(LOCATION, 'model.pkl')
+# scaler_path = os.path.join(LOCATION, 'scaler.pkl')
 
-model  = joblib.load(model_path)
-scaler = joblib.load(scaler_path)
+model  = joblib.load('model.pkl')
+scaler = joblib.load('scaler.pkl')
 
 @app.route('/')
 def index():
