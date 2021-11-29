@@ -4,12 +4,11 @@ import joblib
 import sys
 import os
 
-
 app = Flask(__name__) 
 inputs = np.zeros(shape = [1,9])
 
-
-LOCATION = 'OneDrive\Bureau\plentina\model'
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOCATION = ROOT_DIR +'\model'
 model_path = os.path.join(LOCATION, 'model.pkl')
 scaler_path = os.path.join(LOCATION, 'scaler.pkl')
 
