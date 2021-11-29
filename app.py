@@ -49,9 +49,5 @@ def greeting():
     return render_template('prediction.html', a = jsonify({"data": X_test.tolist()}) , b = a )
 
 if __name__ == '__main__':
-    try:
-        port = int(sys.argv[1])
-    except Exception as e:
-        port = 80
 
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run()
