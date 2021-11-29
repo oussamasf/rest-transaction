@@ -6,7 +6,6 @@ A simple Flask application that can serve predictions from a scikit-learn model.
 Reads a pickled sklearn model into memory when the Flask app is started and returns predictions through the /predict endpoint.
 Any sklearn model can be used for prediction.
 
-**PLEASE change the variable LOCATION in `app.py`  to the convenient PATH** 
 ```
 python app.py <port>
 ```
