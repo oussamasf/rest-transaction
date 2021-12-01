@@ -80,7 +80,7 @@ class Transactions (Resource):
 
 
     def get (self):
-        return make_response(jsonify({'message':"please check documentation to use this API"}),200)
+        return jsonify({'message':"please check documentation to use this API"})
      
 
 api.add_resource(Transactions,'/')
