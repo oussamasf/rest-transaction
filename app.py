@@ -40,7 +40,7 @@ class Transactions (Resource):
             arg['type']== TYPE_[3] or
             arg['type']== TYPE_[4]) :
 
-            return jsonify({'isFraud':False}),200
+            return jsonify({'isFraud':'False'})
 
         elif arg['type']== TYPE_[1] : 
 
@@ -60,7 +60,7 @@ class Transactions (Resource):
             inputs[0,6] = float(arg["newbalanceDest"])
 
         except : 
-            return jsonify({'message':'not valid'}), 422
+            return make_response(jsonify({'message':'not valid'}),422) 
 
 
         # calculation ' putting the model into production '
@@ -74,9 +74,9 @@ class Transactions (Resource):
         predicted = model.predict(X_test)
 
         if predicted == [1] :
-            return jsonify({'isFraud' : True }),200
+            return jsonify({'isFraud' : 'True' })
         else : 
-            return  jsonify({'isFraud' : False }),200
+            return jsonify({'isFraud' : 'False' })
 
 
     def get (self):
