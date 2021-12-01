@@ -1,53 +1,90 @@
-from flask import Flask ,render_template ,request ,jsonify 
+from flask import Flask
+from flask_restful import Resource ,Api ,reqparse
 import numpy as np
 import joblib 
-import sys
-import os
 
-app = Flask(__name__) 
-inputs = np.zeros(shape = [1,9])
+TYPE_ = ['PAYMENT', 'TRANSFER', 'CASH_OUT', 'DEBIT', 'CASH_IN']
 
-# ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-# LOCATION = ROOT_DIR +'\model'
-# model_path = os.path.join(LOCATION, 'model.pkl')
-# scaler_path = os.path.join(LOCATION, 'scaler.pkl')
+# init flask app and the api 
+app = Flask(__name__)
+api = Api(app)
 
+# importing serialized sklearn models 
 model  = joblib.load('model.pkl')
 scaler = joblib.load('scaler.pkl')
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+class Transactions (Resource):
 
-@app.route('/prediction' , methods = ['POST'])
-def greeting():
+    def post (self) : 
+        inputs = np.zeros(shape = [1,9])
 
-    inputs[0,0] = float(request.form.get("step"))
-    inputs[0,1] = float(request.form.get("type"))
-    inputs[0,2] = float(request.form.get("amount"))
-    inputs[0,3] = float(request.form.get("oldbalanceOrig"))
-    inputs[0,4] = float(request.form.get("newbalanceOrig"))
-    inputs[0,5] = float(request.form.get("oldbalanceDest"))
-    inputs[0,6] = float(request.form.get("newbalanceDest"))
+        # init the parser 
+        parser = reqparse.RequestParser()
 
-    if inputs[0,5] == 0 and inputs[0,6] == 0: 
-        inputs[0,5] , inputs[0,6] = -1 , -1 
+        # adding arguments 
+        parser.add_argument('step' , required = True)
+        parser.add_argument('type' , required = True)
+        parser.add_argument('amount' , required = True)
+        parser.add_argument('nameOrig' , required = False)
+        parser.add_argument('oldbalanceOrig' , required = True)
+        parser.add_argument('newbalanceOrig' , required = True)
+        parser.add_argument('nameDest' , required = False)
+        parser.add_argument('oldbalanceDest' , required = True)
+        parser.add_argument('newbalanceDest' , required = True)
 
-    inputs[0,7] = inputs[0,4] + inputs[0,2] - inputs[0,3]
-    inputs[0,8] = inputs[0,5] + inputs[0,2] - inputs[0,6]
-    
-    X_test = scaler.transform(inputs)
+        # convert it to a dict 
+        arg = parser.parse_args()
 
-    # json_ = jsonify(X_test.tolist())
+        # encoding type param
+        if (arg['type']== TYPE_[0] or
+            arg['type']== TYPE_[3] or
+            arg['type']== TYPE_[4]) :
 
-    predicted = model.predict(X_test)
+            return {'isFraud':False}
 
-    if predicted == [1] :
-        a = "scam"
-    else : a = 'legit'
+        elif arg['type']== TYPE_[1] : 
 
-    return render_template('prediction.html', a = jsonify({"data": X_test.tolist()}) , b = a )
+            inputs[0,1] = float(0)
 
-if __name__ == '__main__':
+        else : 
 
+            inputs[0,1] = float(1)
+
+        # handling not valid inputs 
+        try : 
+            inputs[0,0] = float(arg["step"])
+            inputs[0,2] = float(arg["amount"])
+            inputs[0,3] = float(arg["oldbalanceOrig"])
+            inputs[0,4] = float(arg["newbalanceOrig"])
+            inputs[0,5] = float(arg["oldbalanceDest"])
+            inputs[0,6] = float(arg["newbalanceDest"])
+
+        except : 
+            return {'message':'not valid'} , 422 
+
+
+        # calculation ' putting the model into production '
+        if inputs[0,5] == 0 and inputs[0,6] == 0: 
+            inputs[0,5] , inputs[0,6] = -1 , -1 
+
+        inputs[0,7] = inputs[0,4] + inputs[0,2] - inputs[0,3]
+        inputs[0,8] = inputs[0,5] + inputs[0,2] - inputs[0,6]
+        
+        X_test = scaler.transform(inputs)
+        predicted = model.predict(X_test)
+
+        if predicted == [1] :
+            return {'isFraud' : True }
+        else : 
+            return {'isFraud' : False }
+
+
+    def get (self):
+        data = {'message':"please check documentation to use this API"}
+        return data , 200 
+     
+
+api.add_resource(Transactions,'/')
+
+if __name__ == '__main__' : 
     app.run()
