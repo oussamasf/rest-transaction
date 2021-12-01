@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask , jsonify
 from flask_restful import Resource ,Api ,reqparse
 import numpy as np
 import joblib 
@@ -80,11 +80,10 @@ class Transactions (Resource):
 
 
     def get (self):
-        data = {'message':"please check documentation to use this API"}
-        return data , 200 
+        return jsonify({'message':"please check documentation to use this API"}) 
      
 
-api.add_resource(Transactions,'/isfraud')
+api.add_resource(Transactions,'/')
 
 if __name__ == '__main__' : 
     app.run()
