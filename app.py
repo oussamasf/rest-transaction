@@ -84,7 +84,7 @@ class Transactions (Resource):
         return data , 200 
      
 
-api.add_resource(Transactions,'/')
+api.add_resource(Transactions,'/isfraud')
 
 if __name__ == '__main__' : 
     app.run()
